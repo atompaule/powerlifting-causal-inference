@@ -77,9 +77,9 @@ Timelines and Milestones
 Week 1 (15.-21.06.)
 Paul:
 
-- [] Finalize dataset preprocessing
-- [] Carefully assert correctness of processed dataset
-- [] Create variable distributions and correlation clouds
+- [x] Finalize dataset preprocessing
+- [x] Carefully assert correctness of processed dataset
+- [x] Create variable distributions and correlation clouds
 
 Raphael:
 
