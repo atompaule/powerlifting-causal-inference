@@ -17,6 +17,9 @@ FILTERS = {
 # if there is no federation entry, make it "Independent"
 PARENT_FED_FALLBACK = "Independent"
 
+# keep only these sexes (drop the ~37 "Mx" entries)
+SEX_KEEP = ("M", "F")
+
 # keep the chronologically first entry if a contestant appears more than once
 DEDUP_KEEP = "first"
 
@@ -82,6 +85,10 @@ def main() -> None:
     for col, value in FILTERS.items():
         df = df[df[col] == value]
         log_step(f"{col} == {value!r}", df)
+
+    # drop the "Mx" sex (too few entries to model)
+    df = df[df["Sex"].isin(SEX_KEEP)]
+    log_step(f"sex in {SEX_KEEP}", df)
 
     # fill empty federation column with "Independent" instead of dropping the row
     df["ParentFederation"] = df["ParentFederation"].fillna(PARENT_FED_FALLBACK)
