@@ -76,24 +76,31 @@ In our initial experiments, we will try PC and FCI using Fisher-Z independence t
 Timelines and Milestones
 Week 1 (15.-21.06.)
 Paul:
-Finalize dataset preprocessing
-Carefully assert correctness of processed dataset
-Create variable distributions and correlation clouds
+
+- [] Finalize dataset preprocessing
+- [] Carefully assert correctness of processed dataset
+- [] Create variable distributions and correlation clouds
+
 Raphael:
-Analyze variable distributions and correlation clouds
-Research & define appropriate independence test application
-Decide/Rank appropriate independence tests for our causal discovery case
+
+- [] Analyze variable distributions and correlation clouds
+- [] Research & define appropriate independence test application
+- [] Decide/Rank appropriate independence tests for our causal discovery case
 
 Week 2 (22.-28.06.), 🏝️Raphael
+
 Paul:
-Setup initial causal discovery experiments
-Add prior background knowledge (see proposal)
-Run & do initial evaluation
+
+- [] Setup initial causal discovery experiments
+- [] Add prior background knowledge (see proposal)
+- [] Run & do initial evaluation
 
 Week 3 (29.-05.07.), 🏝️Paul
+
 Raphael:
-Research & derive steps for iterative refinement
-(detail more later)
+
+- [] Research & derive steps for iterative refinement
+  (detail more later)
 
 🔥Week 4 (06.-12.07.)
 Implement and run second iteration of causal discovery experiments, based on research insight & derived decisions
