@@ -22,15 +22,14 @@ In each discipline, lifters commonly get three lift attempts of which only the o
 Preprocessing
 Prior to experimentation, we will filter the existing data to remove metrics we do not need for our research. For example, the columns we will drop include “AgeClass” (we already have “Age”), the three individual attempts per discipline (we only care about the best attempt), all attempts of “Bench” and “Deadlift” (we only care about “Squat”), etc.
 
-We will restrict the population to reduce variance in observed variables by filtering the data via constraining certain variables to a specific value that presumably avoid the influence of unobserved latent variables on our observed ones, aiming to increase the explanatory power in our experiments. Specifically, we aim to only include entries of the SBD event of the THSPA federation in which the contestant agreed to being drug-tested (which does not mean they actually got tested) and the meet was officially sanctioned.
+We will restrict the population to reduce variance in observed variables by filtering the data via constraining certain variables to a specific value that presumably avoid the influence of unobserved latent variables on our observed ones, aiming to increase the explanatory power in our experiments. Specifically, we aim to only include entries of the SBD event in which the contestant agreed to being drug-tested (which does not mean they actually got tested) and the meet was officially sanctioned.
 
 Additionally, we will filter the data to only allow for one entry per contestant. This way, we make sure that there can be no within-contestant dependence, and observation can arguably be assumed to be independent and identically distributed.
 
 Furthermore, we will add a new column “Year” that will be derived from “Date” to give us interval-scaling in our time metric. In this dataset, failed attempts are recorded as “negative of the attempted weight”. We will preprocess the data to overwrite all negative records in “Best3SquatKg” with 0. We will either use string encoding or one-hot encoding on “Equipment” for the discovery step.
 -which independence tests can we use for multi-categorical variables vs one-hot encoded?
 
-After filtering, remaining samples will include columns “Age”, “BodyweightKg”, “Sex”, “Equipment”, “Best3SquatKg”, “Event=SBD”, “Tested=Yes”, “Sanctioned=Yes”, “Federation=THSPA”, and “Year”.
--we may include federation as a variable in the graph if the bias, looking only at the biggest federation, is too huge
+After filtering, remaining samples will include columns “Age”, “BodyweightKg”, “Sex”, “Equipment”, “Best3SquatKg”, “Federation”, “Event=SBD”, “Tested=Yes”, “Sanctioned=Yes”, and “Year”.
 
 Columns can have missing values. We will remove all rows with missing values in any of the remaining columns.
 Causal Assumptions
