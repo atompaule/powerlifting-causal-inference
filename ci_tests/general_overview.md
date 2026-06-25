@@ -2,18 +2,13 @@
 
 Wir entscheiden uns, wenige Tests zu wählen, mit denen wir uns kritisch auseinandersetzen, statt viele verschiedene auszuprobieren. Alle gewählten Tests eignen sich für die Arbeit mit PC und FCI.
 
-**Testwahl**
+**Zusammenfassung**
 
 - Haupttest: Conditional Gaussian
-    - Weil: geeignet für mixed-data → kann kontinuierliche und kategorische Variablen gemeinsam modellieren, ohne Diskretisierung oder numerische Kodierung
-        - Dadurch geht keine Information durch Binning/Encoding verloren
-- Sensitivitätsanalyse: G² → prüfen, ob Kanten im Graph ohne Gaussian-Annahme stabil
-    - Weil: behandelt nach Binning alle Variablen rein kategorial und macht damit keine Gaussian-/Linearitätsannahme
-        - ist Robustheitscheck: bleiben Kanten im Graph unter beiden Tests bestehen, steigt das Vertrauen in sie
-- optionale Sensitivitätsanalyse: RCIT → prüfen, ob nichtlineare Abhängigkeiten den Graph verändern
-    - Weil: adressiert die Schwäche, die Conditional Gaussian (rein linear) und G² (nur durch grobes Binning) gemeinsam haben; nichtlineare Abhängigkeiten
+- für Sensitivitätsanalyse: G² → prüfen, ob Kanten im Graph ohne Gaussian-Annahme stabil
+- für optionale weitere Sensitivitätsanalyse: RCIT → prüfen, ob nichtlineare Abhängigkeiten den Graph verändern
 
-**Strukturierung und Begründung**
+**Erläuterung**
 
 - Nach Datenexploration und Correlation Clouds gegen Fisher-Z entschieden, weil:
     1.  Fisher-Z für kontinuierliche, multivariat normalverteilte Variablen gedacht ist

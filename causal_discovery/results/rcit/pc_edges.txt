@@ -1,0 +1,16 @@
+Age --> BodyweightKg
+Age --> Equipment
+Age --> Best3SquatKg
+Age --> ParentFederation
+Sex --> BodyweightKg
+Equipment --> BodyweightKg
+BodyweightKg --- Best3SquatKg
+Year --> BodyweightKg
+BodyweightKg --> ParentFederation
+Sex --> Best3SquatKg
+Equipment --> Best3SquatKg
+Year --> Equipment
+Equipment --> ParentFederation
+Year --> Best3SquatKg
+Best3SquatKg --> ParentFederation
+Year --> ParentFederation

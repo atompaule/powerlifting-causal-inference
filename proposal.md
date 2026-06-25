@@ -91,9 +91,9 @@ Week 2 (22.-28.06.), 🏝️Raphael
 
 Paul:
 
-- [] Setup initial causal discovery experiments
-- [] Add prior background knowledge (see proposal)
-- [] Run & do initial evaluation
+- [x] Setup initial causal discovery experiments
+- [x] Add prior background knowledge (see proposal)
+- [x] Run & do initial evaluation
 
 Week 3 (29.-05.07.), 🏝️Paul
 
