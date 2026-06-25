@@ -83,9 +83,9 @@ Paul:
 
 Raphael:
 
-- [] Analyze variable distributions and correlation clouds
-- [] Research & define appropriate independence test application
-- [] Decide/Rank appropriate independence tests for our causal discovery case
+- [x] Analyze variable distributions and correlation clouds
+- [x] Research & define appropriate independence test application
+- [x] Decide/Rank appropriate independence tests for our causal discovery case
 
 Week 2 (22.-28.06.), 🏝️Raphael
 
