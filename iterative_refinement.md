@@ -3,6 +3,7 @@
     - cg models continuous variables directly
 - how do we deal with the fact that the "0kg" best attempts distort the variable distribution? will gaussian ci test still work?
     - instead, could we encapsulate all 0kg into a new binary variable "success"?
+    - if 0kg are very few, just delete them
 - could we include all antritte of an athlete if we encapsulate the number of the antritt into its own variable (e.g., 1, 2, 3, ...)? would this resolve the within-dependence and make sure it's still i.i.d.?
 - how do we deal with the fact that gaussian ci test cannot figure out continuous -> discrete?
     - only care about skeleton (undirected)?
