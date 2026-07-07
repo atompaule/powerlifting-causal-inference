@@ -59,7 +59,7 @@ TESTS = ["cg", "gsq"]
 ALPHA = 0.05  # standard
 
 # run on a random subsample to avoid statistical significance given tiny differences across variables
-SUBSAMPLE = 20000
+SUBSAMPLE = 0
 
 # how many bins to use for quantile-binning continuous variables under discrete test (G^2)
 N_BINS = 10
@@ -93,7 +93,7 @@ def load_data(test: str) -> pd.DataFrame:
     special case G^2: discretize continuous variables -- quantile-binned and passed as strings
     """
     df = pd.read_csv(DATA_PATH, usecols=VARIABLES)[VARIABLES].copy()
-    if SUBSAMPLE:
+    if SUBSAMPLE > 0:
         df = df.sample(n=SUBSAMPLE)
     for col in DISCRETE:
         df[col] = df[col].astype(str)

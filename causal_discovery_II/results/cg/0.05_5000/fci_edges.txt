@@ -1,4 +1,4 @@
-Best3SquatKg o-o Year
+BodyweightKg o-o Year
 Sex o-o Best3SquatKg
 BodyweightKg o-o Sex
 Year o-o ParentFederation
