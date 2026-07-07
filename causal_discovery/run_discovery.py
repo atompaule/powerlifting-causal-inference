@@ -29,10 +29,6 @@ from causallearn.graph.Endpoint import Endpoint
 from causallearn.search.ConstraintBased.FCI import fci
 from causallearn.search.ConstraintBased.PC import pc
 from causallearn.utils.PCUtils.BackgroundKnowledge import BackgroundKnowledge
-from cg_citest import register_cg
-
-register_cg()  # makes the cg test available in causal-learn
-
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = ROOT / "data_preprocessing" / "squat_equipment_filtered.csv"
@@ -51,7 +47,7 @@ CONTINUOUS = ["Age", "BodyweightKg", "Best3SquatKg", "Year"]
 DISCRETE = ["Sex", "Equipment", "ParentFederation"]
 COLOR = "#5bc0de"
 
-TESTS = ["fisherz", "gsq", "rcit"]
+TESTS = ["cg", "fisherz", "gsq", "rcit"]
 
 ALPHA = 0.05  # standard
 N_BINS = 10  # quantile bins for continuous vars under discrete test (e.g., G^2)
@@ -186,8 +182,6 @@ def run_test(test: str, df: pd.DataFrame, bk: BackgroundKnowledge) -> None:
 
     # tell CG test which columns are categorical
     test_kwargs = {}
-    if test == "cg":
-        test_kwargs["discrete_cols"] = [VARIABLES.index(c) for c in DISCRETE]
     n_used = f"{data.shape[0]:,}"
     print(f"\n--- {test} --- {n_used} rows")
 
