@@ -58,6 +58,9 @@ TESTS = ["cg", "gsq"]
 
 ALPHA = 0.05  # standard
 
+# run on a random subsample to avoid statistical significance given tiny differences across variables
+SUBSAMPLE = 5000
+
 # how many bins to use for quantile-binning continuous variables under discrete test (G^2)
 N_BINS = 10
 
@@ -70,12 +73,28 @@ CG_NUM_CATEGORIES = 3
 EXOGENOUS = ["Year", "Sex", "Age"]
 
 
+def print_bin_counts(df: pd.DataFrame) -> None:
+    n = len(df)
+    print(f"\nBin counts (n={n:,}):")
+    for col in VARIABLES:
+        binned = (
+            df[col] if col in DISCRETE else pd.qcut(df[col], N_BINS, duplicates="drop")
+        )
+        for label, count in binned.value_counts(sort=col in DISCRETE).items():
+            bar = "#" * round(40 * count / n)
+            print(
+                f"  {col:<16} {str(label):<16} {count:>8,} {100 * count / n:5.1f}% {bar}"
+            )
+
+
 def load_data(test: str) -> pd.DataFrame:
     """encode continuous variables as float64, discrete variables as string
 
     special case G^2: discretize continuous variables -- quantile-binned and passed as strings
     """
     df = pd.read_csv(DATA_PATH, usecols=VARIABLES)[VARIABLES].copy()
+    if SUBSAMPLE:
+        df = df.sample(n=SUBSAMPLE)
     for col in DISCRETE:
         df[col] = df[col].astype(str)
     if test == "gsq":
@@ -156,7 +175,7 @@ def draw_graph(edges, names: list[str], title: str, path: Path) -> None:
 
 
 def run_test(test: str) -> None:
-    out_dir = OUT_ROOT / test / str(ALPHA)
+    out_dir = OUT_ROOT / test / (str(ALPHA) + "_" + str(SUBSAMPLE))
     out_dir.mkdir(parents=True, exist_ok=True)
 
     df = load_data(test)
@@ -180,11 +199,11 @@ def run_test(test: str) -> None:
         # forbidding edges within tier 0 gives mutual independence; the tier order
         # forbids edges from tier 1 back into tier 0 (exogeneity).
         for var in EXOGENOUS:
-            search.add_to_tier(0, var) # vars >0 cannot cause vars 0
+            search.add_to_tier(0, var)  # vars >0 cannot cause vars 0
         for var in VARIABLES:
             if var not in EXOGENOUS:
                 search.add_to_tier(1, var)
-        search.set_tier_forbidden_within(0, True) # vars 0 cannot cause other vars 0
+        search.set_tier_forbidden_within(0, True)  # vars 0 cannot cause other vars 0
 
         algorithm = getattr(search, algorithm_name)
         algorithm()
@@ -210,6 +229,8 @@ def run_test(test: str) -> None:
 
 def main() -> None:
     tests = sys.argv[1:] or TESTS
+    df = pd.read_csv(DATA_PATH, usecols=VARIABLES)[VARIABLES]
+    print_bin_counts(df.sample(n=SUBSAMPLE) if SUBSAMPLE else df)
     for test in tests:
         run_test(test)
     print("\nDone.")
