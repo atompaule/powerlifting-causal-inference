@@ -17,6 +17,10 @@ FILTERS = {
 # if there is no federation entry, make it "Independent"
 PARENT_FED_FALLBACK = "Independent"
 
+# also fold rare parent federations (< this share of all entries) into
+# "Independent", so that tiny ausprägungen won't unstablilize causal discovery
+PARENT_FED_MIN_SHARE = 0.03
+
 # keep only these sexes (drop the ~37 "Mx" entries)
 SEX_KEEP = ("M", "F")
 
@@ -108,6 +112,16 @@ def main() -> None:
     # drop all na
     df = df.dropna(axis=0, how="any")
     log_step("complete cases (dropna)", df)
+
+    counts = df["ParentFederation"].value_counts()
+    threshold = PARENT_FED_MIN_SHARE * len(df)
+    rare = counts[counts < threshold].index.tolist()
+    df.loc[df["ParentFederation"].isin(rare), "ParentFederation"] = PARENT_FED_FALLBACK
+    log_step(
+        f"parentfed <{PARENT_FED_MIN_SHARE:.0%} -> {PARENT_FED_FALLBACK} "
+        f"({len(rare)} levels folded)",
+        df,
+    )
 
     # Year is integer-valued after dropping missing dates.
     df["Year"] = df["Year"].astype(int)
