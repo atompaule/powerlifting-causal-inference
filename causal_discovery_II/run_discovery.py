@@ -180,11 +180,11 @@ def run_test(test: str) -> None:
         # forbidding edges within tier 0 gives mutual independence; the tier order
         # forbids edges from tier 1 back into tier 0 (exogeneity).
         for var in EXOGENOUS:
-            search.add_to_tier(0, var)
+            search.add_to_tier(0, var) # vars >0 cannot cause vars 0
         for var in VARIABLES:
             if var not in EXOGENOUS:
                 search.add_to_tier(1, var)
-        search.set_tier_forbidden_within(0, True)
+        search.set_tier_forbidden_within(0, True) # vars 0 cannot cause other vars 0
 
         algorithm = getattr(search, algorithm_name)
         algorithm()
