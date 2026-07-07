@@ -59,7 +59,7 @@ TESTS = ["cg", "gsq"]
 ALPHA = 0.05  # standard
 
 # run on a random subsample to avoid statistical significance given tiny differences across variables
-SUBSAMPLE = 5000
+SUBSAMPLE = 20000
 
 # how many bins to use for quantile-binning continuous variables under discrete test (G^2)
 N_BINS = 10

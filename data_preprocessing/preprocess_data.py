@@ -101,10 +101,9 @@ def main() -> None:
     df = df.sort_values("Date").drop_duplicates(subset="Name", keep=DEDUP_KEEP)
     log_step(f"unique contestant (keep {DEDUP_KEEP})", df)
 
-    # failed squats (negative weight) -> 0
-    n_failed = int((df["Best3SquatKg"] < 0).sum())
-    df.loc[df["Best3SquatKg"] < 0, "Best3SquatKg"] = 0
-    print(f"  set {n_failed:,} failed squats (negative) -> 0")
+    # drop failed squats (negative weight) instead of keeping them
+    df = df[df["Best3SquatKg"] >= 0]
+    log_step("drop failed squats (negative)", df)
 
     # keep only the variables of interest
     df = df[FINAL_COLUMNS]
