@@ -50,36 +50,66 @@ VARIABLES = [
     "Year",
     "ParentFederation",
 ]
-CONTINUOUS = ["Age", "BodyweightKg", "Best3SquatKg", "Year"]
+# continuous vars that stay continuous in CG
+CONTINUOUS = ["BodyweightKg", "Best3SquatKg"]
 DISCRETE = ["Sex", "Equipment", "ParentFederation"]
+# we bin age and year to discrete for ALL tests, because their
+# relationships with the rest are nonlinear/non-monotone (Age peaks then declines, year might also be non-linear, being a highly latent variable)
+# and thus don't agree with cg linear-gaussian assumption for continuous->continuous
+BINNED = ["Age", "Year"]
 COLOR = "#5bc0de"
 
 TESTS = ["cg", "gsq"]
 
-ALPHA = 0.05  # standard
+ALPHA = 0.001
 
-# run on a random subsample to avoid statistical significance given tiny differences across variables
+# run on a random subsample to tame over-power: at full n (~350k) trivially small
+# dependencies test significant, so no independence is ever accepted and the graph gets
+# dense. we subsample to a size where only meaningful effects resolve, then bootstrap
+# within it (below) for edge stability. 0 = full data.
 SUBSAMPLE = 20000
+SEED = 4130213
+
+# bootstrapping: instead of trusting one graph, we resample the subsample many times, run
+# the search on each, and keep the frequency with which each edge appears. edges that show
+# up in a high fraction of resamples are stable; rare ones are likely artifacts.
+# ensemble=1 ("preserved") keeps per-edge bootstrap probabilities on the summary graph.
+N_RESAMPLING = 0
+RESAMPLE_PERCENT = 100  # each resample draws len(subsample) rows (with replacement)
+RESAMPLING_ENSEMBLE = 1
 
 # how many bins to use for quantile-binning continuous variables under discrete test (G^2)
 N_BINS = 10
+
+# how many quantile bins to use when discretizing BINNED vars (Age, Year) for all tests.
+# fewer than N_BINS: these become discrete conditioners, and each level is a separate
+# CG stratum, so too many bins fragments the data and costs power.
+ORDINAL_BINS = 5
 
 # how many categories to discretize continuous parents in CG
 # necessary to model continuous->discrete relationships
 # py-tetrad default is 3
 CG_NUM_CATEGORIES = 3
 
-# background knowledge: year/sex/age are mutually independent and exogenous
-EXOGENOUS = ["Year", "Sex", "Age"]
+# background knowledge as a temporal/causal ordering. edges may only point from an
+# earlier tier to a later one (never backwards) -- see propopsal
+TIERS = [
+    ["Year", "Sex", "Age"],
+    ["ParentFederation", "BodyweightKg"],
+    ["Equipment"],
+    ["Best3SquatKg"],
+]
 
 
 def print_bin_counts(df: pd.DataFrame) -> None:
     n = len(df)
     print(f"\nBin counts (n={n:,}):")
     for col in VARIABLES:
-        binned = (
-            df[col] if col in DISCRETE else pd.qcut(df[col], N_BINS, duplicates="drop")
-        )
+        if col in DISCRETE:
+            binned = df[col]
+        else:
+            bins = ORDINAL_BINS if col in BINNED else N_BINS
+            binned = pd.qcut(df[col], bins, duplicates="drop")
         for label, count in binned.value_counts(sort=col in DISCRETE).items():
             bar = "#" * round(40 * count / n)
             print(
@@ -87,14 +117,19 @@ def print_bin_counts(df: pd.DataFrame) -> None:
             )
 
 
-def load_data(test: str) -> pd.DataFrame:
+def load_data(test: str, subsample: int) -> pd.DataFrame:
     """encode continuous variables as float64, discrete variables as string
 
-    special case G^2: discretize continuous variables -- quantile-binned and passed as strings
+    - BINNED vars (Age, Year) are quantile-binned to discrete for ALL tests, since
+      their relationships are nonlinear/non-monotone
+    - special case G^2: also discretize the remaining continuous vars
     """
     df = pd.read_csv(DATA_PATH, usecols=VARIABLES)[VARIABLES].copy()
-    if SUBSAMPLE > 0:
-        df = df.sample(n=SUBSAMPLE)
+    if subsample > 0:
+        df = df.sample(n=subsample, random_state=SEED)
+    for col in BINNED:
+        df[col] = pd.qcut(df[col], q=ORDINAL_BINS, labels=False, duplicates="drop")
+        df[col] = df[col].astype(str)
     for col in DISCRETE:
         df[col] = df[col].astype(str)
     if test == "gsq":
@@ -115,7 +150,11 @@ def extract_edges(java_graph):
         n2 = str(edge.getNode2().getName())
         e1 = edge.getEndpoint1().name()
         e2 = edge.getEndpoint2().name()
+        # bootstrap frequency of this edge (NaN when bootstrapping is off)
+        prob = float(edge.getProbability())
         label = f"{n1} {_LEFT[e1]}-{_MARK[e2]} {n2}"
+        if prob == prob:  # not NaN
+            label += f"  [p={prob:.2f}]"
         edges.append((n1, n2, e1, e2, label))
     return edges
 
@@ -175,10 +214,12 @@ def draw_graph(edges, names: list[str], title: str, path: Path) -> None:
 
 
 def run_test(test: str) -> None:
-    out_dir = OUT_ROOT / test / (str(ALPHA) + "_" + str(SUBSAMPLE))
+    out_dir = (
+        OUT_ROOT / test / (str(ALPHA) + "_" + str(SUBSAMPLE) + "_" + str(N_RESAMPLING))
+    )
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    df = load_data(test)
+    df = load_data(test, SUBSAMPLE)
     print(f"\n--- {test} --- {len(df):,} rows")
 
     def search_with(algorithm_name: str):
@@ -194,16 +235,21 @@ def run_test(test: str) -> None:
         else:
             raise ValueError(f"unknown test: {test}")
 
-        # apply background knowledge
-        # tier 0: exogenous + mutually independent; tier 1: everything else.
-        # forbidding edges within tier 0 gives mutual independence; the tier order
-        # forbids edges from tier 1 back into tier 0 (exogeneity).
-        for var in EXOGENOUS:
-            search.add_to_tier(0, var)  # vars >0 cannot cause vars 0
-        for var in VARIABLES:
-            if var not in EXOGENOUS:
-                search.add_to_tier(1, var)
-        search.set_tier_forbidden_within(0, True)  # vars 0 cannot cause other vars 0
+        search.set_bootstrapping(
+            numberResampling=N_RESAMPLING,
+            percent_resample_size=RESAMPLE_PERCENT,
+            with_replacement=True,
+            add_original=True,
+            resampling_ensemble=RESAMPLING_ENSEMBLE,
+            seed=SEED,
+        )
+
+        # apply background knowledge (see TIERS): later tiers cannot cause earlier ones,
+        # and tier 0 is mutually independent.
+        for tier, names in enumerate(TIERS):
+            for var in names:
+                search.add_to_tier(tier, var)
+        search.set_tier_forbidden_within(0, True)  # tier-0 vars cannot cause each other
 
         algorithm = getattr(search, algorithm_name)
         algorithm()
@@ -230,7 +276,7 @@ def run_test(test: str) -> None:
 def main() -> None:
     tests = sys.argv[1:] or TESTS
     df = pd.read_csv(DATA_PATH, usecols=VARIABLES)[VARIABLES]
-    print_bin_counts(df.sample(n=SUBSAMPLE) if SUBSAMPLE else df)
+    print_bin_counts(df.sample(n=SUBSAMPLE, random_state=SEED) if SUBSAMPLE else df)
     for test in tests:
         run_test(test)
     print("\nDone.")

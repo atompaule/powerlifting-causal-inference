@@ -54,6 +54,8 @@ We initially assume the dependencies between variables as approximately linear-G
 
 Several trivial assumptions will be added in the form of prior background knowledge during discovery in order to avoid unreasonable graph dependencies. These include unconditional independence of “Year”, “Sex”, and “Age”, as well as unconditional dependence between the equipment variables.
 
+We further encode the known temporal/causal ordering of our variables as tiers, so that edges may only point from smaller to larger tiers and the outcome cannot cause its own causes. We order them as (0) the exogenous “Year”, “Sex”, “Age”, (1) the federation “ParentFederation” and the lifter’s body weight “BodyweightKg”, (2) the equipment choice “Equipment” (constrained by the federation), and (3) the squat result “Best3SquatKg” (causes nothing). Without this ordering, discovery returned impossible edge orientations, such as the performance causing body weight or equipment.
+
 ## Methodological Approach
 
 Our research path can be split into two concrete research phases: causal discovery and causal effect estimation.
@@ -68,6 +70,12 @@ Independence tests will be based initially on Fisher-Z during toy experiments, a
 
 After toy modeling, in order to make sure we use appropriate independence tests, we will analyze variable distributions and correlation clouds to derive appropriate independence tests from, accounting for categorical and skewed-distribution variables as well as non-linear dependencies. Then, we will do another, more informed iteration of causal discovery.
 how do we deal with the fact that conditional dependencies can have different nature than unconditioned ones?
+
+For this informed iteration, we adopt the Conditional Gaussian likelihood-ratio test as our main independence test, as it is designed for the mixed continuous-discrete nature of our data (continuous: “BodyweightKg”, “Best3SquatKg”; discrete: “Sex”, “Equipment”, “ParentFederation”). Since the Conditional Gaussian test assumes linear dependencies between continuous variables, we also use a G^2 test on quantile-binned data as sensitivity test, whereas we will trust edges most that appear with both tests.
+
+Two of our variables, “Age” and “Year”, relate non-linearly and non-monotonically to the rest (performance rises with age first but then declines, “Year” is a latent variable potentially capturing complex effects). This would violate the linearity assumption if remaining continuous, so we quantile-bin “Age” and “Year” into discrete variables for both tests.
+
+Because our filtered dataset is large (~350k entries), the independence tests have extremely large statistical power; very small dependencies test significant, so the algorithm rarely accepts independence and results in densely connected graphs. To keep the tests conservative, we run discovery at a strict significance level (e.g., alpha = 0.001), so that only sufficiently strong dependencies will come with edges.
 
 ### Causal Effect Estimation
 
