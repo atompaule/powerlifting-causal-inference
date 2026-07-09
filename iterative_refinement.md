@@ -1,11 +1,10 @@
 - we do need to use conditional gaussian as main ci test -- g^2 is not enough
     - after all, g^2 works with nominal bins; does not maintain order
     - cg models continuous variables directly
-- how do we deal with the fact that the "0kg" best attempts distort the variable distribution? will gaussian ci test still work?
-    - instead, could we encapsulate all 0kg into a new binary variable "success"?
-    - if 0kg are very few, just delete them
+- cg assumes linear dependence in continuous -> continuous -- how do we deal with the fact that this may not be the case with age -> best3 and bodyweight -> best3?
+    - our graph is fully connected either way -- so is this even a problem?
 - could we include all antritte of an athlete if we encapsulate the number of the antritt into its own variable (e.g., 1, 2, 3, ...)? would this resolve the within-dependence and make sure it's still i.i.d.?
 - how do we deal with the fact that gaussian ci test cannot figure out continuous -> discrete?
     - only care about skeleton (undirected)?
 - what is the cell-sparsity problem in g^2 testing?
-- we have a lot of data -- even tiny, meaningless but sigificant dependencies get discovered -- should we increase alpha?
+- we have a lot of data -- even tiny dependencies get discovered -- is this bad? if so, how do we deal with it, given that increasing alpha does not help?
