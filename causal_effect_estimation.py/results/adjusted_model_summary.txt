@@ -1,0 +1,40 @@
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:           Best3SquatKg   R-squared:                       0.631
+Model:                            OLS   Adj. R-squared:                  0.631
+Method:                 Least Squares   F-statistic:                 4.558e+04
+Date:                Wed, 15 Jul 2026   Prob (F-statistic):               0.00
+Time:                        14:57:10   Log-Likelihood:            -1.7295e+06
+No. Observations:              348511   AIC:                         3.459e+06
+Df Residuals:                  348496   BIC:                         3.459e+06
+Df Model:                          14                                         
+Covariance Type:                  HC1                                         
+==================================================================================================================================
+                                                                     coef    std err          z      P>|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------------------------------------------------
+Intercept                                                        122.1351      0.147    828.129      0.000     121.846     122.424
+C(Equipment, Treatment(reference='Raw'))[T.Multi-ply]             54.3886      1.167     46.605      0.000      52.101      56.676
+C(Equipment, Treatment(reference='Raw'))[T.Single-ply]            24.3372      0.227    107.055      0.000      23.892      24.783
+C(Equipment, Treatment(reference='Raw'))[T.Unlimited]             13.7820      1.240     11.110      0.000      11.351      16.213
+C(Equipment, Treatment(reference='Raw'))[T.Wraps]                  8.4329      0.265     31.813      0.000       7.913       8.952
+C(Sex)[T.M]                                                       52.6513      0.140    376.524      0.000      52.377      52.925
+C(ParentFederation, Treatment(reference='IPF'))[T.IPL]             0.5747      0.223      2.572      0.010       0.137       1.013
+C(ParentFederation, Treatment(reference='IPF'))[T.Independent]    -5.2175      0.142    -36.623      0.000      -5.497      -4.938
+C(ParentFederation, Treatment(reference='IPF'))[T.WPC]            -8.0635      0.311    -25.927      0.000      -8.673      -7.454
+BodyweightKg_c                                                     1.3035      0.004    320.941      0.000       1.296       1.311
+I(BodyweightKg_c ** 2)                                            -0.0082      0.000    -63.302      0.000      -0.008      -0.008
+Age_c                                                              1.1276      0.010    116.056      0.000       1.109       1.147
+I(Age_c ** 2)                                                     -0.0741      0.000   -154.894      0.000      -0.075      -0.073
+Year_c                                                             0.7238      0.014     50.185      0.000       0.696       0.752
+I(Year_c ** 2)                                                     0.0457      0.001     59.863      0.000       0.044       0.047
+==============================================================================
+Omnibus:                     7577.248   Durbin-Watson:                   1.466
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):            15753.071
+Skew:                          -0.108   Prob(JB):                         0.00
+Kurtosis:                       4.019   Cond. No.                     1.68e+04
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity robust (HC1)
+[2] The condition number is large, 1.68e+04. This might indicate that there are
+strong multicollinearity or other numerical problems.

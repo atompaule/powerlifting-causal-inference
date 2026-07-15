@@ -67,7 +67,7 @@ ALPHA = 0.001
 # dependencies test significant, so no independence is ever accepted and the graph gets
 # dense. we subsample to a size where only meaningful effects resolve, then bootstrap
 # within it (below) for edge stability. 0 = full data.
-SUBSAMPLE = 20000
+SUBSAMPLE = 0
 SEED = 4130213
 
 # bootstrapping: instead of trusting one graph, we resample the subsample many times, run
@@ -235,14 +235,14 @@ def run_test(test: str) -> None:
         else:
             raise ValueError(f"unknown test: {test}")
 
-        search.set_bootstrapping(
-            numberResampling=N_RESAMPLING,
-            percent_resample_size=RESAMPLE_PERCENT,
-            with_replacement=True,
-            add_original=True,
-            resampling_ensemble=RESAMPLING_ENSEMBLE,
-            seed=SEED,
-        )
+        # search.set_bootstrapping(
+        #     numberResampling=N_RESAMPLING,
+        #     percent_resample_size=RESAMPLE_PERCENT,
+        #     with_replacement=True,
+        #     add_original=True,
+        #     resampling_ensemble=RESAMPLING_ENSEMBLE,
+        #     seed=SEED,
+        # )
 
         # apply background knowledge (see TIERS): later tiers cannot cause earlier ones,
         # and tier 0 is mutually independent.

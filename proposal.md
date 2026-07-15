@@ -36,7 +36,6 @@ We will restrict the population to reduce variance in observed variables by filt
 Additionally, we will filter the data to only allow for one entry per contestant. This way, we make sure that there can be no within-contestant dependence, and observation can arguably be assumed to be independent and identically distributed.
 
 Furthermore, we will add a new column “Year” that will be derived from “Date” to give us interval-scaling in our time metric. In this dataset, failed attempts are recorded as “negative of the attempted weight”. We will preprocess the data to drop all negative records in “Best3SquatKg” (those mean the lifter failed all three attempts, which is very rare and distorts the distribution). We will either use string encoding or one-hot encoding on “Equipment” for the discovery step.
--which independence tests can we use for multi-categorical variables vs one-hot encoded?
 
 After filtering, remaining samples will include columns “Age”, “BodyweightKg”, “Sex”, “Equipment”, “Best3SquatKg”, “Federation”, “Event=SBD”, “Tested=Yes”, “Sanctioned=Yes”, and “Year”.
 
@@ -81,8 +80,7 @@ Because our filtered dataset is large (~350k entries), the independence tests ha
 
 From the previously learned graph, we aim to find a backdoor-adjustment set Z that blocks all confounding paths between equipment and performance, hypothetically Z = {“Sex”, “Age”, “BodyweightKg”, “Year”}.
 
-In the linear dependence case, we plan to estimate the effect strength of each equipment category on performance relative to “Raw” by regression of performance on all given equipment categories plus Z. This will give us an adjusted effect per category, given the assumption that Z globally blocks every backdoor path between equipment and performance.
-is the global blocking assumption justified? how can we know? what would we do if not?
+We plan to estimate the effect strength of each equipment category on performance relative to “Raw” by regression of performance on all given equipment categories plus Z. This will give us an adjusted effect per category, given the assumption that Z globally blocks every backdoor path between equipment and performance. For continuous regressor variables, we will include quadratic regression terms to allow for adequate modeling of non-linear effects.
 
 Wright’s Linear Path rule seems not to be a suitable alternative given the missing causal sufficiency assumption.
 
